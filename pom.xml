@@ -9,9 +9,9 @@
 		<relativePath/>
 	</parent>
 	<groupId>ru.ds</groupId>
-	<artifactId>javaEE_pilot</artifactId>
+	<artifactId>service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>javaEE_pilot</name>
+	<name>service</name>
 
 	<properties>
 		<java.version>11</java.version>

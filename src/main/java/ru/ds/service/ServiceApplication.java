@@ -1,13 +1,13 @@
-package ru.ds.javaEE_pilot;
+package ru.ds.service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class JavaEePilotApplication {
+public class ServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(JavaEePilotApplication.class, args);
+		SpringApplication.run(ServiceApplication.class, args);
 	}
 
 }
