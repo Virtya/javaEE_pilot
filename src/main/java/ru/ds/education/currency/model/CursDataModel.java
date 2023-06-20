@@ -1,0 +1,42 @@
+package ru.ds.education.currency.model;
+
+import lombok.*;
+import org.codehaus.commons.nullanalysis.NotNull;
+import org.codehaus.commons.nullanalysis.Nullable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.time.LocalDate;
+
+@Entity
+@Getter
+@Setter
+@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor(force = true)
+@Builder
+@Table(name = "curs_data")
+public class CursDataModel {
+
+    @Id
+    @Column(name = "id")
+    private Long id;
+
+    @NotNull
+    @Column(name = "currency_name")
+    private String currencyName;
+
+    @NotNull
+    @Column(name = "currency_code")
+    private Integer currencyCode;
+
+    @NotNull
+    @Column(name = "curs")
+    private Double curs;
+
+    @Nullable
+    @Column(name = "curs_date")
+    private LocalDate cursDate;
+}
