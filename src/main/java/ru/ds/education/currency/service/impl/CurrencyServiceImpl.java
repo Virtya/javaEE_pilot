@@ -1,18 +1,17 @@
 package ru.ds.education.currency.service.impl;
 
-import ma.glasnost.orika.MapperFacade;
-import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.impl.DefaultMapperFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.ds.education.currency.dto.CursDataDto;
 import ru.ds.education.currency.exception.ResourceAlreadyExistException;
 import ru.ds.education.currency.exception.ResourceNotFoundException;
+import ru.ds.education.currency.mapper.MapperCurrency;
 import ru.ds.education.currency.model.CursDataModel;
 import ru.ds.education.currency.repository.CurrencyRepository;
 import ru.ds.education.currency.service.CurrencyService;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -21,12 +20,12 @@ import java.util.Optional;
 public class CurrencyServiceImpl implements CurrencyService {
 
     private final CurrencyRepository currencyRepository;
-
-    MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
+    private final MapperCurrency mapper;
 
     @Autowired
-    public CurrencyServiceImpl(CurrencyRepository currencyRepository) {
+    public CurrencyServiceImpl(CurrencyRepository currencyRepository, MapperCurrency mapper) {
         this.currencyRepository = currencyRepository;
+        this.mapper = mapper;
     }
 
     @Override
@@ -35,7 +34,7 @@ public class CurrencyServiceImpl implements CurrencyService {
         List<CursDataModel> cursDataModels = currencyRepository.findAll();
 
         for (CursDataModel cursDataModel : cursDataModels) {
-            cursDataDtos.add(mapCurModelIntoDto(cursDataModel));
+            cursDataDtos.add(mapper.mapCurModelIntoDto(cursDataModel));
         }
 
         return cursDataDtos;
@@ -51,20 +50,29 @@ public class CurrencyServiceImpl implements CurrencyService {
                             )
                     );
 
-        return mapCurModelIntoDto(cursDataModel);
+        return mapper.mapCurModelIntoDto(cursDataModel);
     }
 
     @Override
-    public CursDataDto getCurrencyByNameAndDate(String name, LocalDate date) {
-        CursDataModel cursDataModel = currencyRepository.findByCurrencyNameAndCursDate(name, date);
+    public CursDataDto getCurrencyByNameAndDate(String name, String date) {
 
-        return mapCurModelIntoDto(cursDataModel);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDate actualDate = LocalDate.parse(date, formatter);
+
+        CursDataModel cursDataModel = currencyRepository.findByCurrencyNameAndCursDate(name, actualDate);
+
+        if (cursDataModel == null) {
+            throw new ResourceNotFoundException("Валюты с именем " + name + " не существует");
+        }
+
+        return mapper.mapCurModelIntoDto(cursDataModel);
     }
 
     @Override
     public void addCurrency(CursDataDto newCur) {
 
-        if (currencyRepository.findByCurrencyName(newCur.getCurrencyName()) != null) {
+        if (currencyRepository.existsByCurrencyName(newCur.getCurrencyName())
+                || currencyRepository.existsByCurrencyCode(newCur.getCurrencyCode())) {
             throw new ResourceAlreadyExistException("Данная валюта уже добавлена");
         }
 
@@ -81,26 +89,36 @@ public class CurrencyServiceImpl implements CurrencyService {
 
     @Override
     public void updateCurrency(Long id, CursDataDto newCur) {
-        Optional<CursDataModel> cursData = Optional.ofNullable(
-                currencyRepository
+        CursDataModel cursData = currencyRepository
                         .findById(id)
                         .orElseThrow(
                                 () -> new ResourceNotFoundException(
-                                        "Валюты с id = " + id + " не сушествует"
+                                        "Валюты с id = " + id + " не существует"
                         )
-                )
         );
 
-        if (cursData.isPresent()) {
-            CursDataModel cursDataModel = cursData.get();
+        String tempName = newCur.getCurrencyName();
+        Integer tempCode = newCur.getCurrencyCode();
+        Double tempCurs = newCur.getCurs();
+        LocalDate tempDate = newCur.getCursDate();
 
-            cursDataModel.setCurrencyCode(newCur.getCurrencyCode());
-            cursDataModel.setCurrencyCode(newCur.getCurrencyCode());
-            cursDataModel.setCurs(newCur.getCurs());
-            cursDataModel.setCursDate(newCur.getCursDate());
-
-            currencyRepository.save(cursDataModel);
+        if (tempName != null) {
+            cursData.setCurrencyName(tempName);
         }
+
+        if (tempCode != null) {
+            cursData.setCurrencyCode(tempCode);
+        }
+
+        if (tempCurs != null) {
+            cursData.setCurs(tempCurs);
+        }
+
+        if (tempDate != null) {
+            cursData.setCursDate(tempDate);
+        }
+
+        currencyRepository.save(cursData);
     }
 
     @Override
@@ -108,31 +126,4 @@ public class CurrencyServiceImpl implements CurrencyService {
         currencyRepository.deleteById(id);
     }
 
-    @Override
-    public CursDataDto mapCurModelIntoDto(CursDataModel curModel) {
-        mapperFactory.classMap(CursDataModel.class, CursDataDto.class)
-                .field("currencyName", "currencyName")
-                .field("currencyCode", "currencyCode")
-                .field("curs", "curs")
-                .field("cursDate", "cursDate")
-                .register();
-
-        MapperFacade mapper = mapperFactory.getMapperFacade();
-
-        return mapper.map(curModel, CursDataDto.class);
-    }
-
-    @Override
-    public CursDataModel mapCurDtoIntoModel(CursDataDto curDto) {
-        mapperFactory.classMap(CursDataDto.class, CursDataModel.class)
-                .field("currencyName", "currencyName")
-                .field("currencyCode", "currencyCode")
-                .field("curs", "curs")
-                .field("cursDate", "cursDate")
-                .register();
-
-        MapperFacade mapper = mapperFactory.getMapperFacade();
-
-        return mapper.map(curDto, CursDataModel.class);
-    }
 }

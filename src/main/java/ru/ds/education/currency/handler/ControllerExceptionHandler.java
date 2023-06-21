@@ -2,14 +2,20 @@ package ru.ds.education.currency.handler;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.ds.education.currency.dto.error.ErrorDto;
 import ru.ds.education.currency.exception.ResourceAlreadyExistException;
 import ru.ds.education.currency.exception.ResourceNotFoundException;
 
+import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.Objects;
 
 @ControllerAdvice
 public class ControllerExceptionHandler {
@@ -24,6 +30,18 @@ public class ControllerExceptionHandler {
         );
     }
 
+
+    @ExceptionHandler(DateTimeParseException.class)
+    public @ResponseBody ResponseEntity<ErrorDto> handleDateTimeParseException(Exception e){
+
+        LocalDate timestamp = LocalDate.now();
+
+        return new ResponseEntity<>(
+                new ErrorDto(e.getMessage() + ". Example: 21-06-2023",timestamp),
+                HttpStatus.NOT_ACCEPTABLE
+        );
+    }
+
     @ExceptionHandler(ResourceAlreadyExistException.class)
     public @ResponseBody ResponseEntity<ErrorDto> handleResourceAlreadyExistsException(Exception e){
 
@@ -32,6 +50,28 @@ public class ControllerExceptionHandler {
         return new ResponseEntity<>(
                     new ErrorDto(e.getMessage(),timestamp),
                     HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public @ResponseBody ResponseEntity<ErrorDto> handleMethodArgumentNotValidException(MethodArgumentNotValidException e){
+
+        LocalDate timestamp = LocalDate.now();
+
+        return new ResponseEntity<>(
+                new ErrorDto(Objects.requireNonNull(e.getFieldError()).getDefaultMessage(), timestamp),
+                HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public @ResponseBody ResponseEntity<ErrorDto> handleMethodArgumentNotValidException(ConstraintViolationException e){
+
+        LocalDate timestamp = LocalDate.now();
+
+        return new ResponseEntity<>(
+                new ErrorDto(Objects.requireNonNull(e.getLocalizedMessage()), timestamp),
+                HttpStatus.CONFLICT
         );
     }
 }

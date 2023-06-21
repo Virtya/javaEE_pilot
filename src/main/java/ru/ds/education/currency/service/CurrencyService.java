@@ -11,16 +11,12 @@ public interface CurrencyService {
 
     CursDataDto getCurrency(Long id);
 
-    CursDataDto getCurrencyByNameAndDate(String name, LocalDate date);
+    CursDataDto getCurrencyByNameAndDate(String name, String date);
 
     void addCurrency(CursDataDto newCur);
 
     void updateCurrency(Long id, CursDataDto newCur);
 
     void deleteCurrency(Long id);
-
-    CursDataDto mapCurModelIntoDto(CursDataModel curModel);
-
-    CursDataModel mapCurDtoIntoModel(CursDataDto curDto);
 
 }

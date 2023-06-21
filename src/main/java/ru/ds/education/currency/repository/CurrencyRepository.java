@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 @Repository
 public interface CurrencyRepository extends JpaRepository<CursDataModel, Long> {
-    boolean exitsByCurrencyName(String name);
+    boolean existsByCurrencyName(String name);
     CursDataModel findByCurrencyName(String name);
     CursDataModel findByCurrencyNameAndCursDate(String name, LocalDate date);
     boolean existsByCurrencyCode(Integer currencyCode);
