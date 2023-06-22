@@ -1,6 +1,5 @@
 package ru.ds.education.currency.mapper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.ConfigurableMapper;
@@ -11,8 +10,6 @@ import ru.ds.education.currency.model.CursDataModel;
 @Component
 @RequiredArgsConstructor
 public class MapperCurrency extends ConfigurableMapper {
-
-    private final ObjectMapper objectMapper;
 
     @Override
     protected void configure(MapperFactory factory) {

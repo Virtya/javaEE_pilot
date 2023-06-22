@@ -1,9 +1,7 @@
 package ru.ds.education.currency.service;
 
 import ru.ds.education.currency.dto.CursDataDto;
-import ru.ds.education.currency.model.CursDataModel;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public interface CurrencyService {

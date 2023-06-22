@@ -1,7 +1,6 @@
 package ru.ds.education.currency.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.ds.education.currency.dto.CursDataDto;
 import ru.ds.education.currency.exception.ResourceAlreadyExistException;
@@ -15,7 +14,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

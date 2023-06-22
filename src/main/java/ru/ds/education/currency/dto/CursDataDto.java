@@ -1,7 +1,6 @@
 package ru.ds.education.currency.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jdk.jfr.Description;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
