@@ -1,5 +1,6 @@
 package ru.ds.education.currency.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.ds.education.currency.dto.CursDataDto;
@@ -17,16 +18,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class CurrencyServiceImpl implements CurrencyService {
 
     private final CurrencyRepository currencyRepository;
     private final MapperCurrency mapper;
-
-    @Autowired
-    public CurrencyServiceImpl(CurrencyRepository currencyRepository, MapperCurrency mapper) {
-        this.currencyRepository = currencyRepository;
-        this.mapper = mapper;
-    }
 
     @Override
     public List<CursDataDto> getAllCurrencies() {
@@ -34,7 +30,7 @@ public class CurrencyServiceImpl implements CurrencyService {
         List<CursDataModel> cursDataModels = currencyRepository.findAll();
 
         for (CursDataModel cursDataModel : cursDataModels) {
-            cursDataDtos.add(mapper.mapCurModelIntoDto(cursDataModel));
+            cursDataDtos.add(mapper.map(cursDataModel, CursDataDto.class));
         }
 
         return cursDataDtos;
@@ -50,7 +46,7 @@ public class CurrencyServiceImpl implements CurrencyService {
                             )
                     );
 
-        return mapper.mapCurModelIntoDto(cursDataModel);
+        return mapper.map(cursDataModel, CursDataDto.class);
     }
 
     @Override
@@ -65,7 +61,7 @@ public class CurrencyServiceImpl implements CurrencyService {
             throw new ResourceNotFoundException("Валюты с именем " + name + " не существует");
         }
 
-        return mapper.mapCurModelIntoDto(cursDataModel);
+        return mapper.map(cursDataModel, CursDataDto.class);
     }
 
     @Override
@@ -76,13 +72,12 @@ public class CurrencyServiceImpl implements CurrencyService {
             throw new ResourceAlreadyExistException("Данная валюта уже добавлена");
         }
 
-        CursDataModel cursDataModel =
-                CursDataModel.builder()
-                            .currencyName(newCur.getCurrencyName())
-                            .currencyCode(newCur.getCurrencyCode())
-                            .curs(newCur.getCurs())
-                            .cursDate(newCur.getCursDate())
-                            .build();
+        CursDataModel cursDataModel = new CursDataModel();
+
+        cursDataModel.setCurrencyName(newCur.getCurrencyName());
+        cursDataModel.setCurrencyCode(newCur.getCurrencyCode());
+        cursDataModel.setCurs(newCur.getCurs());
+        cursDataModel.setCursDate(newCur.getCursDate());
 
         currencyRepository.save(cursDataModel);
     }
@@ -97,32 +92,17 @@ public class CurrencyServiceImpl implements CurrencyService {
                         )
         );
 
-        String tempName = newCur.getCurrencyName();
-        Integer tempCode = newCur.getCurrencyCode();
-        Double tempCurs = newCur.getCurs();
-        LocalDate tempDate = newCur.getCursDate();
-
-        if (tempName != null) {
-            cursData.setCurrencyName(tempName);
-        }
-
-        if (tempCode != null) {
-            cursData.setCurrencyCode(tempCode);
-        }
-
-        if (tempCurs != null) {
-            cursData.setCurs(tempCurs);
-        }
-
-        if (tempDate != null) {
-            cursData.setCursDate(tempDate);
-        }
+        mapper.map(newCur, cursData);
 
         currencyRepository.save(cursData);
     }
 
     @Override
     public void deleteCurrency(Long id) {
+        if (currencyRepository.findById(id).isEmpty()) {
+            throw new ResourceNotFoundException("Валюты с id = " + id + " не существует");
+        }
+
         currencyRepository.deleteById(id);
     }
 

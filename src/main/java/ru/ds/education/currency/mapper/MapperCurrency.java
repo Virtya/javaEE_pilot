@@ -1,10 +1,9 @@
 package ru.ds.education.currency.mapper;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.ConfigurableMapper;
-import ma.glasnost.orika.impl.DefaultMapperFactory;
 import org.springframework.stereotype.Component;
 import ru.ds.education.currency.dto.CursDataDto;
 import ru.ds.education.currency.model.CursDataModel;
@@ -13,32 +12,20 @@ import ru.ds.education.currency.model.CursDataModel;
 @RequiredArgsConstructor
 public class MapperCurrency extends ConfigurableMapper {
 
-    private final MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
+    private final ObjectMapper objectMapper;
 
-    public CursDataDto mapCurModelIntoDto(CursDataModel curModel) {
-        mapperFactory.classMap(CursDataModel.class, CursDataDto.class)
-                .field("currencyName", "currencyName")
-                .field("currencyCode", "currencyCode")
-                .field("curs", "curs")
-                .field("cursDate", "cursDate")
+    @Override
+    protected void configure(MapperFactory factory) {
+
+        factory.classMap(CursDataModel.class, CursDataDto.class)
+                .mapNulls(false)
+                .byDefault()
                 .register();
 
-        MapperFacade mapper = mapperFactory.getMapperFacade();
-
-        return mapper.map(curModel, CursDataDto.class);
-    }
-
-    public CursDataModel mapCurDtoIntoModel(CursDataDto curDto) {
-        mapperFactory.classMap(CursDataDto.class, CursDataModel.class)
-                .field("currencyName", "currencyName")
-                .field("currencyCode", "currencyCode")
-                .field("curs", "curs")
-                .field("cursDate", "cursDate")
+        factory.classMap(CursDataDto.class, CursDataModel.class)
+                .mapNulls(false)
+                .byDefault()
                 .register();
 
-        MapperFacade mapper = mapperFactory.getMapperFacade();
-
-        return mapper.map(curDto, CursDataModel.class);
     }
-
 }

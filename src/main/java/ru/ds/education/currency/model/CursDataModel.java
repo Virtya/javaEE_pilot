@@ -13,7 +13,6 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-@Builder
 @Table(name = "curs_data")
 public class CursDataModel {
 
