@@ -82,10 +82,6 @@ public class CurrencyControllerTest extends ServiceApplicationTest {
     @Test
     @SneakyThrows
     public void createCurrencyTest() {
-        String responseJson = String.format(
-                readFileFromResource("requests/createCurrencyTestRequest.json"),
-                currency3Id + 1
-        );
 
         mockMvc.perform(
                         post(URI.create("/cur"))
