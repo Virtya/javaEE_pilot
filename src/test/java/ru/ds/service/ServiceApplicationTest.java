@@ -17,6 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.testcontainers.containers.JdbcDatabaseContainer;
+import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import ru.ds.education.currency.ServiceApplication;
 
@@ -38,7 +40,8 @@ class ServiceApplicationTest {
 	protected MockMvc mockMvc;
 
 	@ClassRule
-	public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:15.1")
+	public static JdbcDatabaseContainer<?> postgreSQLContainer =
+			new PostgreSQLContainer("postgres:11.1")
 			.withDatabaseName("currency_ds")
 			.withUsername("postgres")
 			.withPassword("123Nikita2609");
