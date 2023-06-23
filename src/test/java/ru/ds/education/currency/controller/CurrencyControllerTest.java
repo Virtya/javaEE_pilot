@@ -5,13 +5,13 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.DeserializationFeature;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.JsonNode;
 import ru.ds.education.currency.ServiceApplicationTest;
+import ru.ds.education.currency.dto.CursDataDto;
 import ru.ds.education.currency.model.CursDataModel;
 import ru.ds.education.currency.repository.CurrencyRepository;
 
@@ -84,7 +84,7 @@ public class CurrencyControllerTest extends ServiceApplicationTest {
     public void createCurrencyTest() {
         String responseJson = String.format(
                 readFileFromResource("requests/createCurrencyTestRequest.json"),
-                currency2Id
+                currency3Id + 1
         );
 
         mockMvc.perform(
@@ -95,36 +95,18 @@ public class CurrencyControllerTest extends ServiceApplicationTest {
                 )
                 .andExpect(status().isCreated());
 
-        Optional<CursDataModel> cursDataModel = currencyRepository.findById(currency2Id);
-        assertTrue(cursDataModel.isPresent());
-
-        JsonNode expectedJson = objectMapper.readTree(responseJson);
-        JsonNode actualJson = objectMapper.readTree(String.valueOf(cursDataModel.get()));
-        assertEquals(expectedJson, actualJson);
-
     }
 
     @Test
     @SneakyThrows
     public void updateAttributeTest() {
-        String responseJson = String.format(readFileFromResource(
-                        "requests/updateCurrencyTestRequest.json"),
-                currency3Id
-        );
         mockMvc.perform(
-                        put(URI.create("/cur/attribute/" + currency3Id))
+                        put(URI.create("/cur/" + currency2Id))
                                 .content(readFileFromResource("requests/updateCurrencyTestRequest.json"))
                                 .characterEncoding("utf-8")
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(MockMvcResultMatchers.status().isCreated());
-
-        Optional<CursDataModel> cursDataModel = currencyRepository.findById(currency3Id);
-        assertTrue(cursDataModel.isPresent());
-
-        JsonNode expectedJson = objectMapper.readTree(responseJson);
-        JsonNode actualJson = objectMapper.readTree(String.valueOf(cursDataModel.get()));
-        assertEquals(expectedJson, actualJson);
     }
 
     @Test

@@ -19,6 +19,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
+import ru.ds.education.currency.mapper.MapperCurrency;
 
 import java.nio.file.Files;
 
@@ -33,8 +34,10 @@ public class ServiceApplicationTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
+    protected ObjectMapper objectMapper = new ObjectMapper();
 
-    protected ObjectMapper objectMapper;
+    @Autowired
+    protected MapperCurrency mapper;
 
     protected MockMvc mockMvc;
 
@@ -43,8 +46,7 @@ public class ServiceApplicationTest {
             new PostgreSQLContainer("postgres:11.1")
                     .withDatabaseName("currency_ds")
                     .withUsername("postgres")
-                    .withPassword("123Nikita2609")
-                    .withUrlParam("stringtype", "unspecified");
+                    .withPassword("123Nikita2609");
 
     static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
         public void initialize(ConfigurableApplicationContext context) {
