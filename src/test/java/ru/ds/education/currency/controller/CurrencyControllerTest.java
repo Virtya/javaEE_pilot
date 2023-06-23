@@ -1,4 +1,4 @@
-package ru.ds.service;
+package ru.ds.education.currency.controller;
 
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterAll;
@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.JsonNode;
+import ru.ds.education.currency.ServiceApplicationTest;
 import ru.ds.education.currency.model.CursDataModel;
 import ru.ds.education.currency.repository.CurrencyRepository;
 
@@ -26,19 +27,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ExtendWith(MockitoExtension.class)
-public class CurrencyControllerTest extends ServiceApplicationTest{
-    @Autowired
-    private final CurrencyRepository currencyRepository;
+public class CurrencyControllerTest extends ServiceApplicationTest {
+
     private final LocalDate currentDate = LocalDate.parse("22-06-2023", DateTimeFormatter.ofPattern("dd-MM-yyyy"));
 
+    @Autowired
+    private CurrencyRepository currencyRepository;
     private Long currency1Id;
     private Long currency2Id;
     private Long currency3Id;
-
-    public CurrencyControllerTest(CurrencyRepository currencyRepository) {
-        this.currencyRepository = currencyRepository;
-    }
 
     @BeforeAll
     @Transactional
@@ -72,11 +69,11 @@ public class CurrencyControllerTest extends ServiceApplicationTest{
         String responseJson = String.format(
                 readFileFromResource("responses/getCurrencyTestResponse.json"),
                 currency1Id
-                );
+        );
 
         mockMvc.perform(
                         get(URI.create("/cur/" + currency1Id))
-                        .characterEncoding("utf-8")
+                                .characterEncoding("utf-8")
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(responseJson, false));
@@ -91,12 +88,12 @@ public class CurrencyControllerTest extends ServiceApplicationTest{
         );
 
         mockMvc.perform(
-              post(URI.create("/cur"))
-              .content(readFileFromResource("requests/createCurrencyTestRequest.json"))
-              .characterEncoding("utf-8")
-              .contentType(MediaType.APPLICATION_JSON)
-        )
-        .andExpect(status().isCreated());
+                        post(URI.create("/cur"))
+                                .content(readFileFromResource("requests/createCurrencyTestRequest.json"))
+                                .characterEncoding("utf-8")
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isCreated());
 
         Optional<CursDataModel> cursDataModel = currencyRepository.findById(currency2Id);
         assertTrue(cursDataModel.isPresent());
@@ -111,14 +108,14 @@ public class CurrencyControllerTest extends ServiceApplicationTest{
     @SneakyThrows
     public void updateAttributeTest() {
         String responseJson = String.format(readFileFromResource(
-                "requests/updateCurrencyTestRequest.json"),
+                        "requests/updateCurrencyTestRequest.json"),
                 currency3Id
         );
         mockMvc.perform(
-                put(URI.create("/cur/attribute/" + currency3Id))
-                        .content(readFileFromResource("requests/updateCurrencyTestRequest.json"))
-                        .characterEncoding("utf-8")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        put(URI.create("/cur/attribute/" + currency3Id))
+                                .content(readFileFromResource("requests/updateCurrencyTestRequest.json"))
+                                .characterEncoding("utf-8")
+                                .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
@@ -134,7 +131,7 @@ public class CurrencyControllerTest extends ServiceApplicationTest{
     @SneakyThrows
     public void deleteAttributeTest() {
         mockMvc.perform(
-                delete(URI.create("/cur/" + currency3Id))
+                        delete(URI.create("/cur/" + currency3Id))
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
