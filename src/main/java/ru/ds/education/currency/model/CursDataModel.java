@@ -41,6 +41,5 @@ public class CursDataModel {
     @Nullable
     @Column(name = "curs_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    @JsonSerialize(using = CustomDateSerializer.class)
     private LocalDate cursDate;
 }

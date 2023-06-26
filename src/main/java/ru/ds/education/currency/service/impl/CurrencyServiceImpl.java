@@ -63,7 +63,7 @@ public class CurrencyServiceImpl implements CurrencyService {
     }
 
     @Override
-    public void addCurrency(CursDataDto newCur) {
+    public CursDataDto addCurrency(CursDataDto newCur) {
 
         if (currencyRepository.existsByCurrencyName(newCur.getCurrencyName())
                 || currencyRepository.existsByCurrencyCode(newCur.getCurrencyCode())) {
@@ -78,10 +78,12 @@ public class CurrencyServiceImpl implements CurrencyService {
         cursDataModel.setCursDate(newCur.getCursDate());
 
         currencyRepository.save(cursDataModel);
+
+        return mapper.map(cursDataModel, CursDataDto.class);
     }
 
     @Override
-    public void updateCurrency(Long id, CursDataDto newCur) {
+    public CursDataDto updateCurrency(Long id, CursDataDto newCur) {
         CursDataModel cursData = currencyRepository
                         .findById(id)
                         .orElseThrow(
@@ -93,6 +95,8 @@ public class CurrencyServiceImpl implements CurrencyService {
         mapper.map(newCur, cursData);
 
         currencyRepository.save(cursData);
+
+        return mapper.map(cursData, CursDataDto.class);
     }
 
     @Override

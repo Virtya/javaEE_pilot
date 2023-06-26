@@ -11,9 +11,9 @@ public interface CurrencyService {
 
     CursDataDto getCurrencyByNameAndDate(String name, String date);
 
-    void addCurrency(CursDataDto newCur);
+    CursDataDto addCurrency(CursDataDto newCur);
 
-    void updateCurrency(Long id, CursDataDto newCur);
+    CursDataDto updateCurrency(Long id, CursDataDto newCur);
 
     void deleteCurrency(Long id);
 

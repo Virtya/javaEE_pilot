@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 public class CustomDateSerializer extends StdSerializer<LocalDate> {
 
-    private SimpleDateFormat formatter
+    private final SimpleDateFormat formatter
             = new SimpleDateFormat("yyyy-MM-dd");
 
     public CustomDateSerializer() {

@@ -59,17 +59,15 @@ public class CurrencyController {
 
     @Operation(summary = "Добавление валюты")
     @PostMapping
-    @ResponseStatus(value = HttpStatus.CREATED)
-    public void addCurrency(@RequestBody @Valid CursDataDto currency){
-        currencyService.addCurrency(currency);
+    public ResponseEntity<CursDataDto> addCurrency(@RequestBody @Valid CursDataDto currency){
+        return new ResponseEntity<>(currencyService.addCurrency(currency), HttpStatus.CREATED);
      }
 
     @Operation(summary = "Изменение валюты")
     @PutMapping ("/{id}")
-    @ResponseStatus(value = HttpStatus.CREATED)
-    public void updateCurrency(@PathVariable @Min(value = 0, message = "Значение должно быть больше нуля") Long id,
+    public ResponseEntity<CursDataDto> updateCurrency(@PathVariable @Min(value = 0, message = "Значение должно быть больше нуля") Long id,
                                @RequestBody @Valid CursDataDto currency){
-        currencyService.updateCurrency(id, currency);
+        return new ResponseEntity<>(currencyService.updateCurrency(id, currency), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Удаление валюты")
