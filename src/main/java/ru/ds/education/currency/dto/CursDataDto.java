@@ -1,8 +1,11 @@
 package ru.ds.education.currency.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import ru.ds.education.currency.serializer.CustomDateSerializer;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -27,6 +30,8 @@ public class CursDataDto {
     @Schema(description = "Текущий курс валюты относительно рубля", example = "78.23")
     private Double curs;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonSerialize(using = CustomDateSerializer.class)
     @Schema(description = "Дата получения информации о курсе валюты", example = "2023-06-21")
     private LocalDate cursDate;
 }

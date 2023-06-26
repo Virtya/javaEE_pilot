@@ -1,5 +1,8 @@
 package ru.ds.education.currency.controller;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import io.swagger.v3.core.util.Json;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -8,8 +11,9 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.DeserializationFeature;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.JsonNode;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.Module;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.SerializationFeature;
 import ru.ds.education.currency.ServiceApplicationTest;
 import ru.ds.education.currency.dto.CursDataDto;
 import ru.ds.education.currency.model.CursDataModel;
@@ -17,6 +21,7 @@ import ru.ds.education.currency.repository.CurrencyRepository;
 
 import javax.transaction.Transactional;
 import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -82,6 +87,10 @@ public class CurrencyControllerTest extends ServiceApplicationTest {
     @Test
     @SneakyThrows
     public void createCurrencyTest() {
+        String responseJson = String.format(
+                readFileFromResource("requests/createCurrencyTestRequest.json"),
+                currency3Id + 1
+        );
 
         mockMvc.perform(
                         post(URI.create("/cur"))
@@ -91,11 +100,27 @@ public class CurrencyControllerTest extends ServiceApplicationTest {
                 )
                 .andExpect(status().isCreated());
 
+        Optional<CursDataModel> cursDataModel = currencyRepository.findById(currency3Id + 1);
+        assertTrue(cursDataModel.isPresent());
+
+        CursDataDto cursDataDto = mapper.map(cursDataModel.get(), CursDataDto.class);
+
+        JsonNode expectedJson = objectMapper.readTree(responseJson);
+
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        JsonNode actualJson = objectMapper.valueToTree(cursDataDto);
+
+        assertEquals(expectedJson, actualJson);
     }
 
     @Test
     @SneakyThrows
     public void updateAttributeTest() {
+        String responseJson = String.format(
+                readFileFromResource("requests/updateCurrencyTestRequest.json"),
+                currency2Id
+        );
+
         mockMvc.perform(
                         put(URI.create("/cur/" + currency2Id))
                                 .content(readFileFromResource("requests/updateCurrencyTestRequest.json"))
@@ -103,6 +128,17 @@ public class CurrencyControllerTest extends ServiceApplicationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(MockMvcResultMatchers.status().isCreated());
+
+        Optional<CursDataModel> cursDataModel = currencyRepository.findById(currency2Id);
+        assertTrue(cursDataModel.isPresent());
+
+        CursDataDto cursDataDto = mapper.map(cursDataModel.get(), CursDataDto.class);
+
+        String expectedString = objectMapper.writeValueAsString(responseJson);
+
+        String actualString = objectMapper.writeValueAsString(cursDataDto);
+
+        assertEquals(expectedString, actualString);
     }
 
     @Test
