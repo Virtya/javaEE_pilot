@@ -1,13 +1,9 @@
 package ru.ds.education.currency.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 import org.codehaus.commons.nullanalysis.NotNull;
 import org.codehaus.commons.nullanalysis.Nullable;
-import ru.ds.education.currency.serializer.CustomDateSerializer;
 
 import javax.persistence.*;
 import java.time.LocalDate;

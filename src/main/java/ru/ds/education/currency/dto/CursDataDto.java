@@ -1,14 +1,10 @@
 package ru.ds.education.currency.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import ru.ds.education.currency.serializer.CustomDateSerializer;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;

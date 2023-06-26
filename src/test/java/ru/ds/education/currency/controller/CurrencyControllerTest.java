@@ -8,11 +8,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.JsonNode;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.SerializationFeature;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.module.SimpleModule;
 import ru.ds.education.currency.ServiceApplicationTest;
-import ru.ds.education.currency.dto.CursDataDto;
 import ru.ds.education.currency.model.CursDataModel;
 import ru.ds.education.currency.repository.CurrencyRepository;
 
