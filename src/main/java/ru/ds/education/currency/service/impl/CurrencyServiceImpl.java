@@ -1,8 +1,11 @@
 package ru.ds.education.currency.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import ru.ds.education.currency.dto.CursDataDto;
+import ru.ds.education.currency.dto.message.RequestMessageDto;
 import ru.ds.education.currency.exception.ResourceAlreadyExistException;
 import ru.ds.education.currency.exception.ResourceNotFoundException;
 import ru.ds.education.currency.mapper.MapperCurrency;
@@ -15,17 +18,23 @@ import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
 
+import static ru.ds.education.currency.config.ActiveMQConfig.REQUEST_QUEUE;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CurrencyServiceImpl implements CurrencyService {
 
     private final CurrencyRepository currencyRepository;
     private final MapperCurrency mapper;
+    private final JmsTemplate jmsTemplate;
 
     @Override
     public List<CursDataDto> getAllCurrencies() {
         List<CursDataDto> cursDataDtos = new LinkedList<>();
         List<CursDataModel> cursDataModels = currencyRepository.findAll();
+
+        log.info("Отправка запроса на получение всех валют");
 
         for (CursDataModel cursDataModel : cursDataModels) {
             cursDataDtos.add(mapper.map(cursDataModel, CursDataDto.class));
@@ -38,11 +47,15 @@ public class CurrencyServiceImpl implements CurrencyService {
     public CursDataDto getCurrency(Long id) {
         CursDataModel cursDataModel = currencyRepository
                     .findById(id)
-                    .orElseThrow(() ->
-                            new ResourceNotFoundException(
-                                    "Валюты с id = " + id + " не существует"
-                            )
+                    .orElseThrow(() -> {
+                                log.error("Получение: валюты с id = " + id + " не существует");
+                                return new ResourceNotFoundException(
+                                        "Валюты с id = " + id + " не существует"
+                                );
+                            }
                     );
+
+        log.info("Получение валюты с id = " + id);
 
         return mapper.map(cursDataModel, CursDataDto.class);
     }
@@ -56,9 +69,14 @@ public class CurrencyServiceImpl implements CurrencyService {
         CursDataModel cursDataModel = currencyRepository.findByCurrencyNameAndCursDate(name, actualDate);
 
         if (cursDataModel == null) {
+            RequestMessageDto messageDto = new RequestMessageDto(name, date);
+            jmsTemplate.convertAndSend(REQUEST_QUEUE, messageDto);
+
+            log.error("Поиск: валюта с именем " + name + " не найдена");
             throw new ResourceNotFoundException("Валюты с именем " + name + " не существует");
         }
 
+        log.info("Получение валюты с именем " + name + ", дата - " + date);
         return mapper.map(cursDataModel, CursDataDto.class);
     }
 
@@ -67,6 +85,7 @@ public class CurrencyServiceImpl implements CurrencyService {
 
         if (currencyRepository.existsByCurrencyName(newCur.getCurrencyName())
                 || currencyRepository.existsByCurrencyCode(newCur.getCurrencyCode())) {
+            log.error("Добавление: валюта " + newCur.getCurrencyName() + " уже существует");
             throw new ResourceAlreadyExistException("Данная валюта уже добавлена");
         }
 
@@ -79,6 +98,8 @@ public class CurrencyServiceImpl implements CurrencyService {
 
         currencyRepository.save(cursDataModel);
 
+        log.info("Создание валюты с именем " + newCur.getCurrencyName());
+
         return mapper.map(cursDataModel, CursDataDto.class);
     }
 
@@ -87,24 +108,30 @@ public class CurrencyServiceImpl implements CurrencyService {
         CursDataModel cursData = currencyRepository
                         .findById(id)
                         .orElseThrow(
-                                () -> new ResourceNotFoundException(
-                                        "Валюты с id = " + id + " не существует"
-                        )
-        );
+                                () -> {
+                                    log.error("Обновление: валюты с id = " + id + " не существует");
+                                    return new ResourceNotFoundException(
+                                            "Валюты с id = " + id + " не существует"
+                                    );
+                                }
+                        );
 
         mapper.map(newCur, cursData);
 
         currencyRepository.save(cursData);
 
+        log.info("Обновление валюты с именем " + cursData.getCurrencyName());
         return mapper.map(cursData, CursDataDto.class);
     }
 
     @Override
     public void deleteCurrency(Long id) {
         if (currencyRepository.findById(id).isEmpty()) {
+            log.error("Удаление: валюты с id = " + id + " не существует");
             throw new ResourceNotFoundException("Валюты с id = " + id + " не существует");
         }
 
+        log.info("Удаление валюты с id = " + id);
         currencyRepository.deleteById(id);
     }
 
