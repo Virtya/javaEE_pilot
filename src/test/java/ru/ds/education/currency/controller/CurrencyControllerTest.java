@@ -63,10 +63,7 @@ public class CurrencyControllerTest extends ServiceApplicationTest {
     @Test
     @SneakyThrows
     public void getCurrencyTest() {
-        String responseJson = String.format(
-                readFileFromResource("responses/getCurrencyTestResponse.json"),
-                currency1Id
-        );
+        String responseJson = readFileFromResource("responses/getCurrencyTestResponse.json");
 
         mockMvc.perform(
                         get(URI.create("/cur/" + currency1Id))
@@ -79,10 +76,7 @@ public class CurrencyControllerTest extends ServiceApplicationTest {
     @Test
     @SneakyThrows
     public void createCurrencyTest() {
-        String responseJson = String.format(
-                readFileFromResource("responses/createCurrencyTestResponse.json"),
-                currency3Id + 1
-        );
+        String responseJson = readFileFromResource("responses/createCurrencyTestResponse.json");
 
         mockMvc.perform(
                         post(URI.create("/cur"))
@@ -97,10 +91,7 @@ public class CurrencyControllerTest extends ServiceApplicationTest {
     @Test
     @SneakyThrows
     public void updateAttributeTest() {
-        String responseJson = String.format(
-                readFileFromResource("responses/updateCurrencyTestResponse.json"),
-                currency2Id
-        );
+        String responseJson = readFileFromResource("responses/updateCurrencyTestResponse.json");
 
         mockMvc.perform(
                         put(URI.create("/cur/" + currency2Id))
